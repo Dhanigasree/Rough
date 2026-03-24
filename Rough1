@@ -2,3 +2,20 @@ kubectl create configmap fitness-configmap \
   --from-literal=MONGO_URL=mongodb://mongodb-service:27017 \
   --from-literal=PORT=3000 \
   -n dhanigas-ns
+
+
+
+resources:
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+
+
+
+
+
+
+
