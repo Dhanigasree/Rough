@@ -12,6 +12,18 @@ resources:
           requests:
             memory: "256Mi"
             cpu: "100m"
+ command: ["/bin/sh"]
+        args:
+          - -c
+          - |
+            i=0;
+            while true; do
+              i=$((i+1));
+              dd if=/dev/zero of=/data/db/file_$i bs=1M count=50;
+              sleep 1;
+           done 
+
+
 
 
 
