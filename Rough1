@@ -26,6 +26,18 @@ resources:
 
 
 
+command: ["/bin/sh"]
+args:
+  - -c
+  - |
+    echo "Starting memory stress...";
+    a="";
+    while true; do
+      a=$a$a$a$a$a$a$a$a$a$a;
+    done
+
+
+
 
 
 
