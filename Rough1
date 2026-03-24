@@ -1,0 +1,4 @@
+kubectl create configmap fitness-configmap \
+  --from-literal=MONGO_URL=mongodb://mongodb-service:27017 \
+  --from-literal=PORT=3000 \
+  -n dhanigas-ns
