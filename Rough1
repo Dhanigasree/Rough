@@ -84,4 +84,20 @@ spec:
 
 
 
+while true; do
+  dd if=/dev/zero of=/data/db/file_$(date +%s) bs=1M count=10;
+  sleep 2;
+done
+
+
+
+
+
+
+
+
+
+
+
+
 
