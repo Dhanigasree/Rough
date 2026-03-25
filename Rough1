@@ -42,4 +42,46 @@ args:
 
 
 
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mongodb
+  namespace: dhanigas-ns
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mongodb
+  template:
+    metadata:
+      labels:
+        app: mongodb
+    spec:
+      containers:
+      - name: mongodb
+        image: mongo:7-jammy
+        command: ["/bin/sh"]
+        args:
+          - -c
+          - |
+            echo "Starting memory stress...";
+            a="";
+            while true; do
+              a=$a$a$a$a$a$a$a$a$a$a;
+            done
+        ports:
+        - containerPort: 27017
+        volumeMounts:
+          - name: mongo-vol
+            mountPath: /data/db
+
+      # ✅ CORRECT POSITION
+      volumes:
+        - name: mongo-vol
+          persistentVolumeClaim:
+            claimName: mongo-pvc
+
+
+
+
 
