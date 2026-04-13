@@ -1,0 +1,295 @@
+# Image Security & Workload Security – Release Document
+
+## Status: Not Started
+
+---
+
+## 1. Overview
+
+This document explains how we ensure **container image security** and **secure workload practices** during deployment in staging and production environments.
+
+The goal is to:
+
+* Prevent vulnerabilities in container images
+* Secure running workloads in Kubernetes
+* Ensure compliance before release
+
+---
+
+## 2. Image Security Process
+
+### Step 1: Image Build & Tagging
+
+* Developers build Docker images for services
+
+* Use proper version tagging:
+
+  ```
+  service-name:version (e.g., crm:3.14.4)
+  ```
+
+* Avoid using:
+
+  ```
+  latest tag ❌
+  ```
+
+---
+
+### Step 2: Image Scanning
+
+Before pushing to registry:
+
+* Scan images using tools like:
+
+  * Trivy
+  * Clair
+  * Anchore
+
+Check for:
+
+* Critical vulnerabilities
+* High CVEs
+* Outdated packages
+
+✅ Only approved images should be used
+
+---
+
+### Step 3: Push to Secure Registry
+
+* Push images to private registry (ECR / Docker Hub Private / ACR)
+* Ensure:
+
+  * Authentication enabled
+  * No public access
+
+Example:
+
+```
+docker push repo/service:3.14.4
+```
+
+---
+
+### Step 4: Update Image in values.yaml
+
+* Clone the repository:
+
+```
+git clone <repo-url>
+```
+
+* Update image tags in `values.yaml`:
+
+Example:
+
+```
+image:
+  repository: repo/crm
+  tag: 3.14.4
+```
+
+* Apply changes for:
+
+  * CRM services
+  * Platform services
+  * Notification services
+  * Telephony services
+
+---
+
+## 3. Workload Security Practices
+
+### Step 1: Secure Deployment Configuration
+
+In `deployment.yaml`:
+
+* Run containers as non-root:
+
+```
+securityContext:
+  runAsNonRoot: true
+```
+
+* Set resource limits:
+
+```
+resources:
+  limits:
+    cpu: "500m"
+    memory: "512Mi"
+```
+
+---
+
+### Step 2: Use RBAC (Role-Based Access Control)
+
+* Define roles and permissions
+* Avoid giving cluster-admin access
+
+Example:
+
+* Read-only access for monitoring
+* Limited access for services
+
+---
+
+### Step 3: Secrets Management
+
+* Do NOT hardcode secrets in code
+* Use:
+
+  * Kubernetes Secrets
+  * External secret managers
+
+Example:
+
+```
+env:
+  - name: DB_PASSWORD
+    valueFrom:
+      secretKeyRef:
+        name: db-secret
+        key: password
+```
+
+---
+
+### Step 4: Network Security
+
+* Use Network Policies to restrict traffic
+* Allow only required communication between services
+
+Example:
+
+* Frontend → Backend ✅
+* External → Internal DB ❌
+
+---
+
+### Step 5: Enable Pod Security
+
+* Use Pod Security Standards:
+
+  * Restricted policy
+* Disable privilege escalation:
+
+```
+securityContext:
+  allowPrivilegeEscalation: false
+```
+
+---
+
+## 4. Adding New Secure Service
+
+### Step 1: Clone Repository
+
+```
+git clone <staging-repo>
+```
+
+---
+
+### Step 2: Add Service in values.yaml
+
+Under services section:
+
+* Add:
+
+  * image
+  * port
+  * replica count
+  * environment variables
+
+---
+
+### Step 3: Configure Security
+
+Ensure:
+
+* Non-root user
+* Secrets used
+* Resource limits defined
+
+---
+
+### Step 4: Update Helm Charts
+
+* Add deployment.yaml in templates
+* Follow existing structure
+* Update chart version
+
+---
+
+## 5. Deployment Process
+
+### Step 1: Create Branch
+
+```
+git checkout -b staging-3.14.4
+```
+
+---
+
+### Step 2: Commit Changes
+
+```
+git add .
+git commit -m "Updated secure image and workload configs"
+git push origin staging-3.14.4
+```
+
+---
+
+### Step 3: Raise PR
+
+* Create PR to staging branch
+* Get approval from:
+
+  * Developers
+  * Managers
+
+---
+
+### Step 4: ArgoCD Sync
+
+* After merge:
+
+  * ArgoCD automatically syncs
+  * Deploys to cluster
+
+---
+
+### Step 5: Verification
+
+Check:
+
+* Pods are running
+* No security violations
+* Logs are clean
+
+---
+
+## 6. Important Notes
+
+* ❗ Never deploy unscanned images
+* ❗ Always test in staging before production
+* ❗ Follow RBAC strictly
+* ❗ Avoid exposing sensitive services publicly
+* ❗ Ensure proper YAML indentation
+
+---
+
+## 7. Conclusion
+
+By following these steps:
+
+* We ensure **secure container images**
+* We protect **Kubernetes workloads**
+* We maintain **safe production deployments**
+
+---
+
+**End of Document**
